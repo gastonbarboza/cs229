@@ -14,6 +14,8 @@ def main(train_path, valid_path, save_path):
 
     # *** START CODE HERE ***
     # Train a logistic regression classifier
+    clf = LogisticRegression()
+    clf.fit(x_train, y_train)
     # Plot decision boundary on top of validation set set
     # Use np.savetxt to save predictions on eval set to save_path
     # *** END CODE HERE ***
@@ -51,6 +53,28 @@ class LogisticRegression:
             y: Training example labels. Shape (n_examples,).
         """
         # *** START CODE HERE ***
+
+        #define sigmoid function
+        sigmoid = lambda x: 1/(1+np.e**(-x))
+
+        #initialize theta as null vector
+        self.theta = np.zeros(3) if (self.theta is None) else self.theta
+
+        #calculate amount needed to change theta
+        def calculateDelta(x, y):
+            h = sigmoid(x@self.theta)
+            gradient = (y-h)@x
+            hessian = np.sum([h[i]*(1 - h[i])*np.outer(x[i, :], x[i, :]) for i in range(len(x))], axis=0)
+            delta = -self.step_size*np.linalg.inv(hessian)@gradient
+            return delta
+
+        #update theta by gradient descent steps
+        for step in range(self.max_iter):
+            delta = calculateDelta(x,y)
+            if np.linalg.norm(delta) < self.eps:
+                break
+            self.theta = self.theta - delta
+
         # *** END CODE HERE ***
 
     def predict(self, x):
